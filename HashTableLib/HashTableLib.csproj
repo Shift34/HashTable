@@ -44,7 +44,6 @@
     <Compile Include="ChainHashTable.cs" />
     <Compile Include="GetPrimeNumber.cs" />
     <Compile Include="HashMaker.cs" />
-    <Compile Include="HashTable.cs" />
     <Compile Include="KeyValuePairClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
