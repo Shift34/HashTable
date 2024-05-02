@@ -80,22 +80,22 @@ namespace HashTableLib
         }
         public bool Remove(TKey key)
         {
-            var item = Find(key);
-
-            if (item == null)
+            if (key == null)
             {
                 throw new NullReferenceException();
             }
-
-            if (item.DeletePair())
+            int index = _hashMaker.ReturnHash(key);
+            if (_table[index] == null) return false;
+            for (int i = 0 ; i < _table[index].Count; i++)
             {
-                Count--;
-                return true;
+                if (_table[index][i].Key.Equals(key))
+                {
+                    _table[index].Remove(new Pair<TKey,TValue>(_table[index][i].Key, _table[index][i].Value));
+                    Count--;
+                    return true;
+                }
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
         public TValue this[TKey key]
         {

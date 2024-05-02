@@ -83,7 +83,6 @@ namespace HashTableTest
             }
             Assert.AreEqual(true, flag);
         }
-        [ExpectedException(typeof(NullReferenceException))]
         [TestMethod]
         public void RemoveNoExist()
         {
@@ -97,7 +96,7 @@ namespace HashTableTest
                 }
                 else keyValuePairs.Add(text[i], 1);
             }
-            keyValuePairs.Remove('h');
+            Assert.AreEqual(false,keyValuePairs.Remove('h'));
         }
         [TestMethod]
         public void AdditionAndRemoveAndComparison()
