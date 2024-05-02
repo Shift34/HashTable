@@ -13,7 +13,7 @@ namespace HashTableLib
         public int Count { get; private set; }
         public bool IsReadOnly { get; private set; }
 
-        private const int MaxChainLength = 8;
+        private const int MaxChainLength = 7;
         private int _currentChainLength;
         private readonly GetPrimeNumber _primeNumber = new GetPrimeNumber();
         private HashMaker<TKey> _hashMaker;
@@ -61,12 +61,8 @@ namespace HashTableLib
                 IncreaseTable();
             }
         }
-        /// <summary>
-        /// TODO
-        /// </summary>
         private void IncreaseTable()
         {
-            // получить следующее число и увеличить таблицу
             int size = _primeNumber.Next();
             _hashMaker.SimpleNumber = size;
             var tempTable = _table;
@@ -82,10 +78,24 @@ namespace HashTableLib
                 }
             }
         }
-        //TODO
         public bool Remove(TKey key)
         {
-            throw new NotImplementedException();
+            var item = Find(key);
+
+            if (item == null)
+            {
+                throw new NullReferenceException();
+            }
+
+            if (item.DeletePair())
+            {
+                Count--;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         public TValue this[TKey key]
         {
@@ -135,7 +145,19 @@ namespace HashTableLib
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            throw new NotImplementedException();
+            if (key == null)
+            {
+                throw new NullReferenceException();
+            }
+
+            if (Find(key) != null)
+            {
+                value = Find(key).Value;
+                return true;
+            }
+
+            value = default;
+            return false;
         }
 
         public void Add(KeyValuePair<TKey, TValue> item)
@@ -155,15 +177,70 @@ namespace HashTableLib
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            if (array == null)
+            {
+                throw new NullReferenceException();
+            }
+
+            if (arrayIndex < 0 || arrayIndex > array.Length)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            if (array.Length - arrayIndex < Count)
+            {
+                throw new ArgumentException();
+            }
+
+            for (int i = 0; i < _table.Length; i++)
+            {
+                foreach (var item in _table[i])
+                {
+                    array[arrayIndex++] = new KeyValuePair<TKey, TValue>(item.Key, item.Value);
+                }
+            }
         }
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
             return Remove(item.Key);
         }
-        public ICollection<TKey> Keys => throw new NotImplementedException();
+        public ICollection<TKey> Keys
+        {
+            get
+            {
+                List<TKey> list = new List<TKey>();
+                for (int i = 0; i < _table.Length; i++)
+                {
+                    if (_table[i] != null)
+                    {
+                        foreach (var item in _table[i].FindAll(x => x.IsDeleted() == false))
+                        {
+                            list.Add(item.Key);
+                        }
+                    }
+                }
+                return list;
+            }
+        }
 
-        public ICollection<TValue> Values => throw new NotImplementedException();
+        public ICollection<TValue> Values
+        {
+            get
+            {
+                List<TValue> list = new List<TValue>();
+                for (int i = 0; i < _table.Length; i++)
+                {
+                    if (_table[i] != null)
+                    {
+                        foreach (var item in _table[i].FindAll(x => x.IsDeleted() == false))
+                        {
+                            list.Add(item.Value);
+                        }
+                    }
+                }
+                return list;
+            }
+        }
     }
 }
